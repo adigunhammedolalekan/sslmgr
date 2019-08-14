@@ -126,11 +126,15 @@ func NewServer(c ServerConfig) (*SecureServer, error) {
 	if c.GracefulShutdownErrHandler == nil {
 		c.GracefulShutdownErrHandler = func(e error) { /* NOP */ }
 	}
+	hostPolicy := func(ctx context.Context, host string) error {
+		log.Println(host)
+		return nil
+	}
 	ss := &SecureServer{
 		server: &http.Server{Handler: c.Handler},
 		certMgr: &autocert.Manager{
 			Prompt:     autocert.AcceptTOS,
-			HostPolicy: autocert.HostWhitelist(c.Hostnames...),
+			HostPolicy: hostPolicy,
 			Cache:      c.CertCache,
 		},
 		serveSSLFunc:               c.ServeSSLFunc,
